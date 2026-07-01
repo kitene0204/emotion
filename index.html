@@ -3,95 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>우리 반 감정 체크판</title>
+    <title>우리반 감정 체크판</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #FDF9F1; /* 따뜻한 크림색 배경 */
-        }
-        /* 스크롤바 숨기기 (선택사항) */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #E2E8F0;
-            border-radius: 4px;
-        }
-        /* 감정 텍스트 줄바꿈 방지 */
-        .emotion-text {
-            word-break: keep-all;
-        }
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body { font-family: 'Pretendard', sans-serif; background-color: #fdfbf7; }
+        
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+        
+        .emotion-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .emotion-btn:hover { transform: scale(1.05); }
+        .emotion-btn:active { transform: scale(0.95); }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8 text-gray-800">
+<body class="h-screen flex flex-col text-slate-800 overflow-hidden">
 
-    <div class="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-end mb-6 px-2 gap-4">
-        <div>
-            <h1 class="text-3xl md:text-4xl font-black text-gray-800 tracking-tight">오늘 내 기분은?</h1>
-            <p id="currentDate" class="text-gray-500 font-medium mt-2 text-lg"></p>
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-md shadow-sm z-10 border-b border-slate-100 flex-none">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl sm:text-4xl" role="img" aria-label="sun">🌻</span>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-800">우리반 감정 체크판</h1>
+                    <p id="currentDate" class="text-sm sm:text-base text-slate-500 font-medium"></p>
+                </div>
+            </div>
+            
+            <button id="exportBtn" class="hidden sm:flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-full font-semibold transition-colors shadow-sm border border-emerald-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                구글 시트 열기
+            </button>
+            <button id="exportBtnMobile" class="sm:hidden p-2 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+            </button>
         </div>
-        <button id="exportBtn" class="flex items-center gap-2 bg-white border border-gray-200 text-gray-600 px-5 py-2.5 rounded-xl shadow-sm hover:bg-gray-50 transition-colors font-medium text-sm w-full md:w-auto justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-            구글 시트 열기
-        </button>
-    </div>
+    </header>
 
-    <div class="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+    <!-- Main Board -->
+    <main class="flex-grow p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full flex flex-col h-[calc(100vh-5rem)]">
         
-        <!-- [왼쪽 영역] 기분 고르기 -->
-        <div class="bg-white rounded-[2.5rem] border-[8px] border-[#FFF0F5] p-6 md:p-8 shadow-sm h-full flex flex-col">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl md:text-3xl font-bold text-[#FF4B72] flex items-center gap-3">
-                    <span class="text-3xl">🎨</span> 기분 고르기
-                </h2>
-                <span class="bg-gray-100 text-gray-500 px-5 py-2 rounded-full text-sm font-medium">
-                    30가지 감정
-                </span>
+        <div class="flex-grow flex flex-col lg:flex-row gap-6 lg:gap-8 min-h-0">
+            
+            <!-- LEFT PANEL: Student List (우리 반 친구들) -->
+            <div id="step1Container" class="flex-1 bg-white rounded-3xl shadow-sm border-[3px] border-blue-100 flex flex-col min-h-[50vh] lg:min-h-0 transition-all duration-300">
+                <div class="p-5 lg:p-6 pb-2 border-b-2 border-blue-50 border-dashed flex justify-between items-center bg-blue-50/30 rounded-t-3xl">
+                    <h2 class="text-xl lg:text-2xl font-bold text-blue-600 flex items-center gap-2">
+                        <span>🏫</span> 우리 반 친구들
+                    </h2>
+                    <button id="resetAllBtn" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium rounded-xl transition-colors active:scale-95">
+                        화면 지우기
+                    </button>
+                </div>
+                
+                <div class="flex-grow overflow-y-auto p-5 lg:p-6 custom-scrollbar" id="userListContainer">
+                    <!-- Users injected here -->
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: Emotions List (기분 고르기) -->
+            <div id="step2Container" class="flex-1 bg-white rounded-3xl shadow-sm border-[3px] border-pink-100 flex flex-col min-h-[50vh] lg:min-h-0 opacity-50 pointer-events-none transition-all duration-300 relative">
+                
+                <div class="p-5 lg:p-6 pb-2 border-b-2 border-pink-50 border-dashed flex justify-between items-center bg-pink-50/30 rounded-t-3xl">
+                    <h2 class="text-xl lg:text-2xl font-bold text-pink-500 flex items-center gap-2">
+                        <span>🎨</span> 기분 고르기
+                    </h2>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-medium text-pink-300 bg-white px-3 py-1 rounded-full shadow-sm border border-pink-50">30가지 감정</span>
+                    </div>
+                </div>
+
+                <!-- Active User Indicator (Step 2 Actions) -->
+                <div id="step2Actions" class="hidden absolute -top-4 right-8 bg-white shadow-md border-2 border-brand-200 rounded-full px-4 py-2 flex items-center gap-3 z-10 animate-bounce-short">
+                    <span id="selectedUserBadge" class="font-bold text-brand-600 text-lg">선택된 이름</span>
+                    <button id="cancelSelectBtn" class="text-sm text-slate-400 hover:text-slate-600 font-medium">취소</button>
+                </div>
+
+                <div class="flex-grow overflow-y-auto p-5 lg:p-6 custom-scrollbar">
+                    <div id="emotionsContainer" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 sm:gap-4">
+                        <!-- Emotions injected here -->
+                    </div>
+                </div>
             </div>
             
-            <!-- 감정 버튼 그리드 -->
-            <div id="emotionsGrid" class="grid grid-cols-4 sm:grid-cols-5 gap-3 md:gap-4 flex-grow content-start">
-                <!-- JavaScript로 감정 버튼들이 렌더링됩니다 -->
-            </div>
         </div>
+    </main>
 
-        <!-- [오른쪽 영역] 우리 반 친구들 -->
-        <div class="bg-white rounded-[2.5rem] border-[8px] border-[#F0F8FF] p-6 md:p-8 shadow-sm h-full flex flex-col">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl md:text-3xl font-bold text-[#4B7CFF] flex items-center gap-3">
-                    <span class="text-3xl">🏫</span> 우리 반 친구들
-                </h2>
-                <button id="clearAllBtn" class="text-gray-500 hover:text-gray-800 bg-gray-50 hover:bg-gray-100 border border-gray-200 px-5 py-2 rounded-full text-sm transition-colors font-medium">
-                    전체 지우기
-                </button>
-            </div>
-            
-            <!-- 학생 목록 그리드 -->
-            <div id="usersGrid" class="grid grid-cols-2 sm:grid-cols-2 gap-x-4 gap-y-3 md:gap-x-6 md:gap-y-4 flex-grow content-start">
-                <!-- JavaScript로 학생 버튼들이 렌더링됩니다 -->
-            </div>
-        </div>
-
-    </div>
-
-    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-4 rounded-full shadow-2xl opacity-0 pointer-events-none transition-all duration-300 z-50 flex items-center gap-3 font-medium translate-y-4">
-        <span id="toastIcon" class="text-2xl">✅</span>
-        <span id="toastMessage" class="text-lg">저장되었습니다.</span>
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex items-center gap-2">
+        <span id="toastIcon">✅</span>
+        <span id="toastMessage">저장되었습니다.</span>
     </div>
 
     <script>
         // === 구글 앱스 스크립트 웹앱 URL ===
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyt3zubaFQHSAAej6OjFO57MsBaUFLAyHpmAMqRN1Vir4W-QfAUu9gOkuY4MKeJLiKO/exec';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJxFdjuZNLVt7sZh9Xwrh-ZrTx6q4ncHO23efJrDqmIeBwZuQZmsJ5Eb9GGwTXuKaG/exec';
         const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1RGs6NjgGk6_OHRtFmcYsMun8PaQpFi2xaNSQDgPc3FM/edit?gid=0#gid=0';
 
-        // --- Data ---
+        // --- Configuration & Data ---
         const USERS = [
             "강윤찬", "강주연", "김민지", "김진후", "김현지", 
             "박채현", "성서아", "송다정", "엄호준", "윤시우", 
@@ -100,168 +115,204 @@
         ];
 
         const EMOTIONS = [
-            { emoji: "😀", name: "행복해요" }, { emoji: "🤩", name: "신나요" }, { emoji: "😊", name: "기분좋아요" }, { emoji: "🥰", name: "사랑가득해요" }, { emoji: "😎", name: "자신있어요" },
-            { emoji: "🤩", name: "기대돼요" }, { emoji: "😌", name: "편안해요" }, { emoji: "🤤", name: "배고파요" }, { emoji: "🤪", name: "장난치고싶어요" }, { emoji: "😴", name: "졸려요" },
-            { emoji: "🥱", name: "피곤해요" }, { emoji: "😐", name: "그냥그래요" }, { emoji: "😕", name: "헷갈려요" }, { emoji: "😟", name: "걱정돼요" }, { emoji: "😔", name: "우울해요" },
-            { emoji: "😢", name: "슬퍼요" }, { emoji: "😭", name: "눈물이나요" }, { emoji: "😤", name: "짜증나요" }, { emoji: "😡", name: "화가나요" }, { emoji: "🤬", name: "너무화나요" },
-            { emoji: "😱", name: "깜짝놀랐어요" }, { emoji: "😨", name: "무서워요" }, { emoji: "😰", name: "불안해요" }, { emoji: "🤕", name: "아파요" }, { emoji: "😶", name: "멍해요" },
-            { emoji: "😳", name: "부끄러워요" }, { emoji: "😫", name: "답답해요" }, { emoji: "🥺", name: "외로워요" }, { emoji: "😌", name: "뿌듯해요" }, { emoji: "🤢", name: "속이안좋아요" }
+            { name: "행복해요", emoji: "😀", bg: "bg-red-50" },
+            { name: "신나요", emoji: "🤩", bg: "bg-orange-50" },
+            { name: "기분좋아요", emoji: "😊", bg: "bg-amber-50" },
+            { name: "사랑가득해요", emoji: "🥰", bg: "bg-yellow-50" },
+            { name: "자신있어요", emoji: "😎", bg: "bg-lime-50" },
+            { name: "기대돼요", emoji: "🥳", bg: "bg-green-50" },
+            { name: "편안해요", emoji: "😌", bg: "bg-emerald-50" },
+            { name: "배고파요", emoji: "🤤", bg: "bg-teal-50" },
+            { name: "장난치고싶어요", emoji: "🤪", bg: "bg-cyan-50" },
+            { name: "졸려요", emoji: "😴", bg: "bg-sky-50" },
+            { name: "피곤해요", emoji: "🥱", bg: "bg-blue-50" },
+            { name: "그냥그래요", emoji: "😐", bg: "bg-indigo-50" },
+            { name: "헷갈려요", emoji: "🤔", bg: "bg-violet-50" },
+            { name: "걱정돼요", emoji: "😟", bg: "bg-purple-50" },
+            { name: "우울해요", emoji: "😔", bg: "bg-fuchsia-50" },
+            { name: "슬퍼요", emoji: "😢", bg: "bg-pink-50" },
+            { name: "눈물이나요", emoji: "😭", bg: "bg-rose-50" },
+            { name: "짜증나요", emoji: "😤", bg: "bg-red-100" },
+            { name: "화가나요", emoji: "😡", bg: "bg-orange-100" },
+            { name: "너무화나요", emoji: "🤬", bg: "bg-amber-100" },
+            { name: "깜짝놀랐어요", emoji: "😱", bg: "bg-yellow-100" },
+            { name: "무서워요", emoji: "😨", bg: "bg-lime-100" },
+            { name: "불안해요", emoji: "😰", bg: "bg-green-100" },
+            { name: "아파요", emoji: "🤕", bg: "bg-emerald-100" },
+            { name: "멍해요", emoji: "😶", bg: "bg-teal-100" },
+            { name: "부끄러워요", emoji: "😳", bg: "bg-cyan-100" },
+            { name: "답답해요", emoji: "😩", bg: "bg-sky-100" },
+            { name: "외로워요", emoji: "🥺", bg: "bg-blue-100" },
+            { name: "뿌듯해요", emoji: "😇", bg: "bg-indigo-100" },
+            { name: "속이안좋아요", emoji: "🤢", bg: "bg-violet-100" }
         ];
 
         // --- State ---
         let state = {
-            todayData: {}, // { "강윤찬": "행복해요" }
-            currentUserSelecting: null // 현재 감정을 선택하기 위해 클릭한 학생 이름
+            todayData: {},
+            currentUserSelecting: null
         };
 
-        // DOM Elements
-        const emotionsGrid = document.getElementById('emotionsGrid');
-        const usersGrid = document.getElementById('usersGrid');
+        // --- DOM Elements ---
+        const userListContainer = document.getElementById('userListContainer');
+        const emotionsContainer = document.getElementById('emotionsContainer');
+        const step1Container = document.getElementById('step1Container');
+        const step2Container = document.getElementById('step2Container');
+        const selectedUserBadge = document.getElementById('selectedUserBadge');
+        const step2Actions = document.getElementById('step2Actions');
+        const cancelSelectBtn = document.getElementById('cancelSelectBtn');
+        const resetAllBtn = document.getElementById('resetAllBtn');
         const toast = document.getElementById('toast');
         const toastIcon = document.getElementById('toastIcon');
         const toastMessage = document.getElementById('toastMessage');
 
+        // --- Utils ---
         const getDisplayDate = () => {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const date = String(now.getDate()).padStart(2, '0');
-            const days = ['일', '월', '화', '수', '목', '금', '토'];
-            const day = days[now.getDay()];
-            return `${year}년 ${month}월 ${date}일 (${day})`;
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            return today.toLocaleDateString('ko-KR', options);
         };
 
         let toastTimeout;
         const showToast = (message, icon = "✅") => {
             toastIcon.textContent = icon;
             toastMessage.textContent = message;
-            toast.classList.remove('opacity-0', 'translate-y-4');
-            toast.classList.add('opacity-100', 'translate-y-0');
+            toast.classList.remove('opacity-0', 'pointer-events-none');
             
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => {
-                toast.classList.remove('opacity-100', 'translate-y-0');
-                toast.classList.add('opacity-0', 'translate-y-4');
+                toast.classList.add('opacity-0', 'pointer-events-none');
             }, 3000);
         };
 
-        const getEmojiByName = (emotionName) => {
-            const emotion = EMOTIONS.find(e => e.name === emotionName);
-            return emotion ? emotion.emoji : '❓';
-        };
-
+        // --- Renders ---
         const renderUsers = () => {
-            usersGrid.innerHTML = '';
+            userListContainer.innerHTML = '';
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-2 md:grid-cols-2 gap-3 sm:gap-4';
+
             USERS.forEach(user => {
-                const isSelected = state.currentUserSelecting === user;
-                const userEmotionName = state.todayData[user];
+                const emotionName = state.todayData[user];
+                const emotionObj = EMOTIONS.find(e => e.name === emotionName);
+                const hasEmotion = !!emotionName;
+                const isSelectingThisUser = state.currentUserSelecting === user;
+
+                const userCard = document.createElement('button');
                 
-                const btn = document.createElement('div');
-                // 디자인 시안에 맞춘 스타일 적용 (둥근 모서리, 배경색)
-                btn.className = `
-                    flex justify-between items-center px-4 md:px-5 py-3 md:py-4 rounded-3xl cursor-pointer transition-all duration-200
-                    ${isSelected ? 'bg-blue-50 ring-4 ring-blue-300 shadow-lg scale-[1.02]' : 'bg-[#FAFAFA] hover:bg-gray-100'}
-                `;
+                // Base classes
+                let cardClasses = `flex items-center justify-between p-3 sm:p-4 rounded-2xl w-full text-left transition-all duration-200 border-2 `;
                 
-                // 이름
+                if (isSelectingThisUser) {
+                    cardClasses += `bg-blue-50 border-blue-400 shadow-md ring-4 ring-blue-100 scale-105 `;
+                } else if (hasEmotion) {
+                    cardClasses += `bg-white border-blue-100 hover:border-blue-200 shadow-sm `;
+                } else {
+                    cardClasses += `bg-slate-50 border-transparent hover:bg-slate-100 hover:border-slate-200 `;
+                }
+
+                userCard.className = cardClasses;
+                userCard.onclick = () => selectUser(user);
+
                 const nameSpan = document.createElement('span');
-                nameSpan.className = `text-[16px] md:text-[18px] ${isSelected ? 'font-black text-blue-700' : 'font-bold text-gray-700'}`;
+                nameSpan.className = `font-bold text-base sm:text-lg ${isSelectingThisUser ? 'text-blue-700' : 'text-slate-700'}`;
                 nameSpan.textContent = user;
 
-                // 상태 (대기중 or 선택된 감정)
                 const statusDiv = document.createElement('div');
                 
-                if (userEmotionName) {
-                    // 감정이 선택된 상태 (알약 모양 디자인)
-                    const emoji = getEmojiByName(userEmotionName);
-                    statusDiv.className = 'bg-white px-3 py-1.5 rounded-2xl shadow-sm flex items-center gap-2 border border-gray-100';
-                    statusDiv.innerHTML = `
-                        <span class="text-xl md:text-2xl leading-none">${emoji}</span>
-                        <span class="text-[14px] font-bold text-gray-800 emotion-text">${userEmotionName}</span>
-                    `;
+                if (hasEmotion && emotionObj) {
+                    statusDiv.className = 'flex items-center gap-2 bg-white px-3 py-1.5 rounded-full shadow-sm border border-slate-100';
+                    statusDiv.innerHTML = `<span class="text-xl">${emotionObj.emoji}</span> <span class="text-sm font-semibold text-slate-700">${emotionObj.name}</span>`;
                 } else {
-                    // 대기중 상태
-                    statusDiv.className = 'text-[15px] font-medium text-gray-300 mr-2';
+                    statusDiv.className = 'text-sm font-medium text-slate-400';
                     statusDiv.textContent = '대기중';
                 }
 
-                btn.appendChild(nameSpan);
-                btn.appendChild(statusDiv);
-
-                // 클릭 이벤트
-                btn.addEventListener('click', () => {
-                    if (state.currentUserSelecting === user) {
-                        state.currentUserSelecting = null; // 선택 해제
-                    } else {
-                        state.currentUserSelecting = user;
-                        // 모바일 화면에서는 감정 판으로 스크롤 이동
-                        if(window.innerWidth < 1024) {
-                             setTimeout(() => {
-                                 emotionsGrid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                             }, 100);
-                             showToast(`${user} 친구의 기분을 골라주세요!`, "👇");
-                        }
-                    }
-                    renderUsers();
-                });
-
-                usersGrid.appendChild(btn);
+                userCard.appendChild(nameSpan);
+                userCard.appendChild(statusDiv);
+                grid.appendChild(userCard);
             });
+
+            userListContainer.appendChild(grid);
         };
 
         const renderEmotions = () => {
-            emotionsGrid.innerHTML = '';
+            emotionsContainer.innerHTML = '';
+            
             EMOTIONS.forEach(emotion => {
-                const btn = document.createElement('div');
-                // 디자인 시안에 맞춘 연한 핑크 배경 둥근 사각형
-                btn.className = 'bg-[#FFF5F7] hover:bg-pink-100 rounded-3xl p-3 sm:p-4 flex flex-col items-center justify-center cursor-pointer transition-transform hover:-translate-y-1 hover:shadow-md border border-transparent hover:border-pink-300 aspect-square';
-                
-                // 이름 두 줄 바꿈 처리 (예: 기분좋아요 -> 기분<br>좋아요)
-                // 단순히 반으로 자르기보다 단어 형태 유지되도록 공백 처리 (데이터 구조 변경 불가하므로 CSS word-break로 처리 권장, 여기서는 데이터 그대로 출력)
+                const btn = document.createElement('button');
+                btn.className = `emotion-btn flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl ${emotion.bg} border-2 border-transparent hover:border-pink-200 aspect-square group`;
+                btn.onclick = () => selectEmotion(emotion);
+
                 btn.innerHTML = `
-                    <div class="text-4xl sm:text-5xl mb-2 drop-shadow-md">${emotion.emoji}</div>
-                    <div class="text-[13px] sm:text-[14px] font-bold text-gray-800 text-center leading-snug emotion-text tracking-tight">${emotion.name.replace(/ /g, '<br>')}</div>
+                    <span class="text-4xl sm:text-5xl mb-2 group-hover:scale-110 transition-transform">${emotion.emoji}</span>
+                    <span class="text-xs sm:text-sm font-bold text-slate-600 text-center break-keep leading-tight">${emotion.name}</span>
                 `;
-
-                btn.addEventListener('click', () => selectEmotion(emotion));
-
-                emotionsGrid.appendChild(btn);
+                
+                emotionsContainer.appendChild(btn);
             });
+        };
+
+        // --- Actions ---
+        const selectUser = (name) => {
+            state.currentUserSelecting = name;
+            
+            // UI Update
+            renderUsers();
+            
+            // Activate Step 2 (Emotions)
+            step1Container.classList.add('opacity-75'); // 왼편 살짝 흐리게
+            step2Container.classList.remove('opacity-50', 'pointer-events-none');
+            step2Container.classList.add('ring-4', 'ring-pink-200', 'shadow-xl');
+            
+            selectedUserBadge.textContent = `${name}의 기분은?`;
+            step2Actions.classList.remove('hidden');
+            
+            // Scroll to emotions if on mobile
+            if (window.innerWidth < 1024) {
+                step2Container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        };
+
+        const resetSelection = () => {
+            state.currentUserSelecting = null;
+            renderUsers();
+            
+            step1Container.classList.remove('opacity-75');
+            step2Container.classList.add('opacity-50', 'pointer-events-none');
+            step2Container.classList.remove('ring-4', 'ring-pink-200', 'shadow-xl');
+            
+            step2Actions.classList.add('hidden');
         };
 
         const selectEmotion = async (emotion) => {
             if (!state.currentUserSelecting) {
-                showToast("오른쪽에서 먼저 이름을 선택해주세요!", "👆");
+                showToast("왼쪽에서 먼저 이름을 선택해주세요!", "👆");
                 return;
             }
             
             const user = state.currentUserSelecting;
             const emotionName = emotion.name; 
+            const emotionEmoji = emotion.emoji; 
 
             // 1. 화면 즉시 반영 (낙관적 업데이트)
             state.todayData[user] = emotionName;
-            state.currentUserSelecting = null; 
-            renderUsers();
+            const tempUser = state.currentUserSelecting; // for toast
+            resetSelection(); // selection 해제 및 렌더링
             
             // 2. 구글 시트로 전송
             try {
                 const formData = new URLSearchParams();
-                formData.append('name', user);
+                formData.append('name', tempUser);
                 formData.append('emotion', emotionName);
+                formData.append('emoji', emotionEmoji);
 
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     body: formData,
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                }).then(response => {
-                    if(response.ok) {
-                         showToast(`${user} 친구의 기분이 기록되었습니다.`, "✨");
-                    }
-                }).catch(e => {
-                     console.error(e);
-                     showToast("서버 연결에 실패했습니다.", "⚠️");
                 });
                 
+                showToast(`${tempUser}의 감정(${emotionName})이 기록되었습니다.`);
             } catch (error) {
                 console.error("Error saving emotion:", error);
                 showToast("저장 중 오류가 발생했습니다.", "❌");
@@ -270,50 +321,43 @@
 
         const loadFromGoogleSheet = async () => {
             try {
-                // 우측에 로딩 표시 임시로
-                toastIcon.textContent = "⏳";
-                toastMessage.textContent = "오늘의 기록을 불러오는 중...";
-                toast.classList.remove('opacity-0', 'translate-y-4');
-                toast.classList.add('opacity-100', 'translate-y-0');
-
                 const response = await fetch(GOOGLE_SCRIPT_URL);
                 const data = await response.json();
                 state.todayData = data || {};
                 renderUsers();
-                
-                toast.classList.remove('opacity-100', 'translate-y-0');
-                toast.classList.add('opacity-0', 'translate-y-4');
-
             } catch (error) {
                 console.error("데이터 로드 실패:", error);
-                toast.classList.remove('opacity-100', 'translate-y-0');
-                toast.classList.add('opacity-0', 'translate-y-4');
             }
         };
 
+        const resetAll = () => {
+            if (confirm("현재 화면의 감정 기록을 모두 지우시겠습니까?\n(※ 구글 시트의 기록은 삭제되지 않습니다.)")) {
+                state.todayData = {};
+                resetSelection();
+                showToast("화면이 초기화되었습니다.", "🧹");
+            }
+        };
+
+        const openGoogleSheet = () => {
+            window.open(SPREADSHEET_URL, '_blank');
+        };
+
+        // --- Event Listeners & Init ---
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('currentDate').textContent = getDisplayDate();
             
-            renderEmotions();
             renderUsers();
+            renderEmotions();
+
+            cancelSelectBtn.addEventListener('click', resetSelection);
+            resetAllBtn.addEventListener('click', resetAll);
+            
+            document.getElementById('exportBtn').addEventListener('click', openGoogleSheet);
+            document.getElementById('exportBtnMobile').addEventListener('click', openGoogleSheet);
+
+            // 구글 시트에서 오늘 기록 불러오기
             loadFromGoogleSheet();
-
-            document.getElementById('exportBtn').addEventListener('click', () => {
-                window.open(SPREADSHEET_URL, '_blank');
-            });
-
-            document.getElementById('clearAllBtn').addEventListener('click', () => {
-                if(Object.keys(state.todayData).length === 0) return;
-                
-                // alert, confirm 사용 금지 원칙에 따라 커스텀 모달 또는 간단히 바로 리셋하되 안내 메시지 띄움
-                // 여기서는 시트 데이터는 지우지 않고 화면만 지운다는 것을 토스트로 알림
-                state.todayData = {};
-                state.currentUserSelecting = null;
-                renderUsers();
-                showToast("화면이 초기화되었습니다. (시트 기록은 보존됨)", "🧹");
-            });
         });
-
     </script>
 </body>
 </html>
